@@ -16,7 +16,7 @@ pipeline {
           checkout scm 
           echo "branch: ${env.GIT_BRANCH}"
           echo "commit: ${env.GIT_COMMIT}"
-          echi "checked out the code from the repo"
+          echo "checked out the code from the repo"
         }
       }
       stage('gitleaks') {
