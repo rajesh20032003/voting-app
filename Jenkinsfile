@@ -1,14 +1,12 @@
 pipeline {
   agent any 
+
   stages {
-   stage('docker build'){
-    steps {
-      script {
-        sh """
-        docker build -t frontend ./frontend
-        """
+    stage('checkout-scm') {
+      steps {
+         chekout scm  
+         echo "checking out the code from last commit : ${env.GIT_COMMIT}"
       }
     }
-   }
   }
 }
