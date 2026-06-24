@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vote!</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      margin-bottom: 48px;
+      font-size: 1rem;
+    }
+
+    .vote-section {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .vote-btn {
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      padding: 40px 56px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #e2e8f0;
+      transition: all 0.2s;
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .vote-btn:hover { transform: translateY(-4px); border-color: #6366f1; }
+    .vote-btn.option-a:hover { border-color: #6366f1; background: #1e1b4b; }
+    .vote-btn.option-b:hover { border-color: #ec4899; background: #2d1b3d; }
+    .vote-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .vote-btn .emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+
+    .results {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid #334155;
+    }
+
+    .results h2 {
+      font-size: 1.2rem;
+      margin-bottom: 24px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .result-row { margin-bottom: 20px; }
+
+    .result-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .result-label .pct { color: #94a3b8; font-size: 0.9rem; }
+
+    .bar-bg {
+      background: #0f172a;
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+
+    .bar-a { background: linear-gradient(90deg, #6366f1, #818cf8); }
+    .bar-b { background: linear-gradient(90deg, #ec4899, #f472b6); }
+
+    .total {
+      text-align: center;
+      margin-top: 24px;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #22c55e;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+      z-index: 999;
+    }
+
+    .toast.error { background: #ef4444; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .status {
+      font-size: 0.8rem;
+      color: #475569;
+      margin-top: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🗳️ Vote!</h1>
+  <p class="subtitle">Cast your vote — one per person</p>
+
+  <div class="vote-section">
+    <button class="vote-btn option-a" onclick="vote('option_a')" id="btn-a">
+      <span class="emoji">🐱</span>
+      <span id="label-a">Cats</span>
+    </button>
+    <button class="vote-btn option-b" onclick="vote('option_b')" id="btn-b">
+      <span class="emoji">🐶</span>
+      <span id="label-b">Dogs</span>
+    </button>
+  </div>
+
+  <div class="results">
+    <h2>Live Results</h2>
+    <div class="result-row">
+      <div class="result-label">
+        <span id="res-label-a">Cats</span>
+        <span class="pct" id="pct-a">0%</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill bar-a" id="bar-a" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="result-row">
+      <div class="result-label">
+        <span id="res-label-b">Dogs</span>
+        <span class="pct" id="pct-b">0%</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill bar-b" id="bar-b" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="total" id="total">0 votes total</div>
+  </div>
+
+  <p class="status" id="status">Connecting to API...</p>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = window.BACKEND_URL || 'http://localhost:3000';
+    let voted = localStorage.getItem('voted') === 'true';
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '') + ' show';
+      setTimeout(() => t.className = 'toast' + (isError ? ' error' : ''), 3000);
+    }
+
+    async function vote(option) {
+      if (voted) { showToast('You already voted!', true); return; }
+      try {
+        const res = await fetch(`${API}/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ option })
+        });
+        const data = await res.json();
+        if (!res.ok) { showToast(data.error, true); return; }
+        voted = true;
+        localStorage.setItem('voted', 'true');
+        document.getElementById('btn-a').disabled = true;
+        document.getElementById('btn-b').disabled = true;
+        showToast(data.message);
+        fetchResults();
+      } catch(e) {
+        showToast('Failed to connect to API', true);
+      }
+    }
+
+    async function fetchResults() {
+      try {
+        const res = await fetch(`${API}/results`);
+        const data = await res.json();
+        document.getElementById('label-a').textContent = data.option_a.label;
+        document.getElementById('label-b').textContent = data.option_b.label;
+        document.getElementById('res-label-a').textContent = data.option_a.label;
+        document.getElementById('res-label-b').textContent = data.option_b.label;
+        document.getElementById('pct-a').textContent = data.option_a.percentage + '%';
+        document.getElementById('pct-b').textContent = data.option_b.percentage + '%';
+        document.getElementById('bar-a').style.width = data.option_a.percentage + '%';
+        document.getElementById('bar-b').style.width = data.option_b.percentage + '%';
+        document.getElementById('total').textContent = `${data.total} vote${data.total !== 1 ? 's' : ''} total`;
+        document.getElementById('status').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+      } catch(e) {
+        document.getElementById('status').textContent = 'API unreachable';
+      }
+    }
+
+    if (voted) {
+      document.getElementById('btn-a').disabled = true;
+      document.getElementById('btn-b').disabled = true;
+    }
+
+    fetchResults();
+    setInterval(fetchResults, 3000);
+  </script>
+</body>
+</html>
