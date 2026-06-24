@@ -24,12 +24,14 @@ pipeline {
           script {
             sh """
             docker run --rm \
-              -v \${WORKSPACE}:/repo \
-              zricethezav/gitleaks:latest \
-              detect --source /repo \
-              --report-format json \
-              --report-path /repo/gitleaks-report.json \
-              -v || true
+          -v \${WORKSPACE}:/repo \
+          -e GITLEAKS_LOG_OPTS="--all" \
+          zricethezav/gitleaks:latest \
+          detect --source /repo \
+          --no-git \
+          --report-format json \
+          --report-path /repo/gitleaks-report.json \
+          -v || true
             """
           archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
           }
