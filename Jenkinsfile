@@ -9,7 +9,7 @@ pipeline {
          echo "checking out the code from last commit : ${env.GIT_COMMIT}"
       }
     }
-  }
+  
   stage('gitleaks-secret-scan') {
     agent {
       docker {
@@ -28,4 +28,5 @@ pipeline {
       }
     }
   }
+}
 }
