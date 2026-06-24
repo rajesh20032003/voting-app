@@ -22,5 +22,16 @@ pipeline {
       }
     }
   }
+
+  stage('npm ci') {
+    steps {
+      dir('frontend') {
+        sh '''
+        npm ci --no-audit 
+        npm test 
+        '''
+      }
+    }
+  }
 }
 }
