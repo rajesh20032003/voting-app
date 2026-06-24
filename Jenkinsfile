@@ -20,7 +20,6 @@ pipeline {
         }
       }
     stage('gitleaks') {
-  when { expression { params.RUN_GITLEAKS } }
   steps {
     script {
       // create empty report first so archiving never fails
