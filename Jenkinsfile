@@ -11,12 +11,6 @@ pipeline {
     }
   
   stage('gitleaks-secret-scan') {
-    agent {
-      docker {
-       image 'ghcr.io/gitleaks/gitleaks:latest'
-        args '-u root'
-      }
-    }
     steps {
       sh '''
       gitleaks detect --source . --verbose --report-path=gitleaks-report.json
