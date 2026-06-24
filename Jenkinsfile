@@ -5,7 +5,7 @@ pipeline {
     stage('checkout-scm') {
       steps {
          cleanWs()
-         chekout scm  
+         checkout scm  
          echo "checking out the code from last commit : ${env.GIT_COMMIT}"
       }
     }
@@ -13,7 +13,7 @@ pipeline {
   stage('gitleaks-secret-scan') {
     agent {
       docker {
-        image 'zricethezav/gitleaks:latest'
+       image 'ghcr.io/gitleaks/gitleaks:latest'
         args '-u root'
       }
     }
