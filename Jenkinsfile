@@ -30,7 +30,7 @@ pipeline {
 
     }
     steps {
-      dir('frontend') {
+      dir('backend') {
         sh '''
         npm ci --no-audit 
         npm test
