@@ -6,7 +6,7 @@ pipeline {
       steps {
          cleanWs()
          checkout scm  
-         echo "checking out the code from last commit : ${env.GIT_COMMIT}"
+         echo "checking out rthe code from last commit : ${env.GIT_COMMIT}"
       }
     }
   
