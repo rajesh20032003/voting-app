@@ -19,23 +19,37 @@ pipeline {
           echo "checked out the code from the repo"
         }
       }
-      stage('gitleaks') {
-        steps {
-          script {
-            sh """
-            docker run --rm \
+    stage('gitleaks') {
+  when { expression { params.RUN_GITLEAKS } }
+  steps {
+    script {
+      // create empty report first so archiving never fails
+      sh "echo '[]' > gitleaks-report.json"
+
+      sh """
+        docker run --rm \
           -v \${WORKSPACE}:/repo \
-          -e GITLEAKS_LOG_OPTS="--all" \
           zricethezav/gitleaks:latest \
-          detect --source /repo \
+          detect \
+          --source /repo \
           --no-git \
           --report-format json \
           --report-path /repo/gitleaks-report.json \
-          -v || true
-            """
-          archiveArtifacts artifacts: 'gitleaks-report.json', allowEmptyArchive: true
-          }
-        }
-      }
+          -v
+      """
+    }
+  }
+  post {
+    always {
+      archiveArtifacts artifacts: 'gitleaks-report.json'
+    }
+    failure {
+      echo '❌ Gitleaks found secrets! Check gitleaks-report.json'
+    }
+    success {
+      echo '✅ No secrets found!'
+    }
+  }
+}
   }
 }
