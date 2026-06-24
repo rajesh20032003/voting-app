@@ -19,11 +19,22 @@ pipeline {
           echo "checked out the code from the repo"
         }
       }
-    stage('gitleaks') {
-  steps {
-    script {
-      // create empty report first so archiving never fails
+stage('gitleaks') {
+   steps {
+    script
       sh "echo '[]' > gitleaks-report.json"
+
+      // debug — see what's in workspace
+      sh "ls -la \${WORKSPACE}"
+      sh "ls -la \${WORKSPACE}/backend"
+
+      // check if docker can see the files
+      sh """
+        docker run --rm \
+          -v \${WORKSPACE}:/repo \
+          zricethezav/gitleaks:latest \
+          sh -c "ls -la /repo"
+      """
 
       sh """
         docker run --rm \
@@ -39,16 +50,9 @@ pipeline {
     }
   }
   post {
-    always {
-      archiveArtifacts artifacts: 'gitleaks-report.json'
-    }
-    failure {
-      echo '❌ Gitleaks found secrets! Check gitleaks-report.json'
-    }
-    success {
-      echo '✅ No secrets found!'
-    }
+    always { archiveArtifacts artifacts: 'gitleaks-report.json' }
+    failure { echo '❌ Secrets found!' }
+    success { echo '✅ No secrets found!' }
   }
 }
   }
-}
