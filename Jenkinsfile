@@ -1,11 +1,14 @@
 pipeline {
   agent any 
   stages {
-    stage('checkout code') {
-      steps {
-        echo "code is already checked out i think"
-        echo ls 
+   stage('docker build'){
+    steps {
+      script {
+        sh """
+        docker build -t frontend ./frontend
+        """
       }
     }
+   }
   }
 }
