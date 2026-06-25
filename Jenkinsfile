@@ -54,8 +54,14 @@ pipeline {
         steps {
           dir('frontend') {
             sh '''
-            docker build \
-             -t ${REGISTRY}/${GIT_COMMIT}-frontend-${BUILD_NUMBER} .
+           docker buildx create frontend-builder --use
+
+           docker buildx build \
+           --builder frontend-builder \
+           --platform linux/amd64 \
+           --tag ${REGISTRY}/frontend:${BUILD_NUMBER} \
+           -- load \
+           .
             '''
           }
         }
