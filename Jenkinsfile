@@ -186,7 +186,7 @@ pipeline {
             }
              post {
             always {
-              archiveArtifacts artifacts: 'frontend-cylondx-sbom.json' allowEmptyArchive: true
+              archiveArtifacts artifacts: 'frontend-cylondx-sbom.json', allowEmptyArchive: true
             }
           }
           }
@@ -199,7 +199,7 @@ pipeline {
             }
           post {
             always {
-              archiveArtifacts artifacts: 'backend-cylondx-sbom.json' allowEmptyArchive: true
+              archiveArtifacts artifacts: 'backend-cylondx-sbom.json' ,allowEmptyArchive: true
             }
           }
         }
