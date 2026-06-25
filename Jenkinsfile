@@ -127,7 +127,7 @@ pipeline {
               sh '''
               SERVICE=frontend
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-              trivy image --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
+              trivy image --cache-dir /tmp/trivy-$SERVICE  --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
               '''
             }
         }
@@ -142,7 +142,7 @@ pipeline {
               sh '''
               SERVICE=backend
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-              trivy image --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
+              trivy image --cache-dir /tmp/trivy-$SERVICE --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
               '''
             }
         }
