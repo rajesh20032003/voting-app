@@ -7,6 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest --coverage --reporters=default --reporters=jest-junit",
+    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit",
     "lint": "eslint ."
   },
    "jest-junit": {

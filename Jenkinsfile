@@ -43,7 +43,7 @@ pipeline {
       dir('backend') {
         sh '''
         npm ci --no-audit 
-        npm test 
+        npm run test:ci
         
       
         '''
@@ -51,9 +51,10 @@ pipeline {
     }
     post {
       always {
-         junit 'backend/reports/junit.xml'
-
-        archiveArtifacts artifacts: 'backend/coverage/lcov.info'
+        archiveArtifacts artifacts: '''
+backend/coverage/lcov.info,
+backend/reports/junit.xml
+''', allowEmptyArchive: true
       }
     }
   }
