@@ -181,12 +181,12 @@ pipeline {
             steps {
               sh '''
               SERVICE=frontend
-              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
+              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclonedx-sbom.json
               '''
             }
              post {
             always {
-              archiveArtifacts artifacts: 'frontend-cylondx-sbom.json', allowEmptyArchive: true
+              archiveArtifacts artifacts: 'frontend-cyclonedx-sbom.json', allowEmptyArchive: true
             }
           }
           }
@@ -194,12 +194,12 @@ pipeline {
            steps {
               sh '''
               SERVICE=backend              
-              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
+              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclonedx-sbom.json
               '''
             }
           post {
             always {
-              archiveArtifacts artifacts: 'backend-cylondx-sbom.json' ,allowEmptyArchive: true
+              archiveArtifacts artifacts: 'backend-cyclonedx-sbom.json' ,allowEmptyArchive: true
             }
           }
         }
