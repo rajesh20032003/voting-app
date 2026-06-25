@@ -172,6 +172,19 @@ pipeline {
           }
         }
       }
+
+      stage('generate sbom') {
+        parallel {
+          stage('frontend-sbom'){
+            stages {
+              sh '''
+              SERVICE=frontend
+              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
+              '''
+            }
+          }
+        }
+      }
     }
   }
 }
