@@ -118,6 +118,7 @@ pipeline {
   stage('trivy scan'){
     parallel {
       stage('frontend-img-scan') {
+        steps{
         withCredentials([usernamePassword(
              credentialsId: 'dockerhub-creds',
              usernameVariable: 'DOCKER_USER',
@@ -129,8 +130,10 @@ pipeline {
               trivy image --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
               '''
             }
+        }
       }
       stage('backend-img-scan') {
+        steps{
         withCredentials([usernamePassword(
              credentialsId: 'dockerhub-creds',
              usernameVariable: 'DOCKER_USER',
@@ -142,6 +145,7 @@ pipeline {
               trivy image --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
               '''
             }
+        }
       }
     }
   }
