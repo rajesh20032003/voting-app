@@ -100,8 +100,9 @@ pipeline {
            docker buildx build \
            --builder "$BUILDER" \
            --platform linux/amd64 \
+           --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \ 
            --cache-to type=registry,ref=$REGISTRY/$SERVICE:buildcache,mode=max \
-           --cache-from type-registry,ref=$REGISTRY/$SERVICE:buildcache \
+           --cache-from type=registry,ref=$REGISTRY/$SERVICE:buildcache \
            --push \
            .
 
@@ -111,6 +112,36 @@ pipeline {
             }
           }
         }
+      }
+    }
+  }
+  stage('trivy scan'){
+    parallel {
+      stage('frontend-img-scan') {
+        withCredentials([usernamePassword(
+             credentialsId: 'dockerhub-creds',
+             usernameVariable: 'DOCKER_USER',
+             passwordVariable: 'DOCKER_PASS'
+            )]){
+              sh '''
+              SERVICE=frontend
+              echo $DOCKER_PASS | docker login -u $DOCKER_PASS --password-stdin
+              trivy image --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
+              '''
+            }
+      }
+      stage('backend-img-scan') {
+        withCredentials([usernamePassword(
+             credentialsId: 'dockerhub-creds',
+             usernameVariable: 'DOCKER_USER',
+             passwordVariable: 'DOCKER_PASS'
+            )]){
+              sh '''
+              SERVICE=backend
+              echo $DOCKER_PASS | docker login -u $DOCKER_PASS --password-stdin
+              trivy image --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
+              '''
+            }
       }
     }
   }
