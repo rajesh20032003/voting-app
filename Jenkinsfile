@@ -55,11 +55,13 @@ pipeline {
         steps {
           dir('frontend') {
             withCredentials([usernamePassword(
-             crendentialsId: 'dockerhub-creds',
+             credentialsId: 'dockerhub-creds',
              usernameVariable: 'DOCKER_USER',
              passwordVariable: 'DOCKER_PASS'
             )]){
            sh '''
+           BUILDER=frontend-${BUILD_NUMBER}
+           
            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
            docker buildx create --name frontend-builder --driver docker-container --use
 
@@ -89,7 +91,7 @@ pipeline {
             docker buildx build \
              --builder backend \
              --platform linux/amd64 \
-             --tag ${REGISTRY}/frontend:${BUILD_NUMBER} \
+             --tag ${REGISTRY}/backend:${BUILD_NUMBER} \
              --load \
              .
             
