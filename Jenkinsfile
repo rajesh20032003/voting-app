@@ -31,24 +31,24 @@ pipeline {
       """
     }
   }
-  stage('npm ci') {
-    agent {
-      docker { 
-        image 'node:24.17.0-alpine3.24'
-        args '-v $HOME/.npm:/root/.npm'
-        }
+  // stage('npm ci') {
+  //   agent {
+  //     docker { 
+  //       image 'node:24.17.0-alpine3.24'
+  //       args '-v $HOME/.npm:/root/.npm'
+  //       }
 
-    }
-    steps {
-      dir('backend') {
-        sh '''
-        // npm ci --no-audit 
-        echo "backend"
+  //   }
+  //   steps {
+  //     dir('backend') {
+  //       sh '''
+  //       // npm ci --no-audit 
+  //       echo "backend"
       
-        '''
-      }
-    }
-  }
+  //       '''
+  //     }
+  //   }
+  // }
   stage('Debug BuildKit') {
     steps {
         sh '''
