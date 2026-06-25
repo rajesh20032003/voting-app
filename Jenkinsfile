@@ -42,25 +42,40 @@ pipeline {
     steps {
       dir('backend') {
         sh '''
-        npm ci --no-audit 
+        // npm ci --no-audit 
+        echo "backend"
       
         '''
       }
     }
   }
+  stage('Debug BuildKit') {
+    steps {
+        sh '''
+        whoami
+        pwd
+
+        docker version
+        docker buildx version
+        docker buildx ls
+
+        docker context ls
+        '''
+    }
+}
   stage('image building'){
     parallel {
       stage('frontend-building') {
         steps {
           dir('frontend') {
             sh '''
-           docker buildx create frontend-builder --use
+           docker buildx create --name frontend-builder --use
 
            docker buildx build \
            --builder frontend-builder \
            --platform linux/amd64 \
            --tag ${REGISTRY}/frontend:${BUILD_NUMBER} \
-           -- load \
+           --load \
            .
             '''
           }
