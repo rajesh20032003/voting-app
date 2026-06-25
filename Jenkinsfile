@@ -70,10 +70,12 @@ pipeline {
            --builder "$BUILDER" \
            --platform linux/amd64 \
            --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \
-           --load \
+           --cache-to type=registry,ref=$REGISTRY/$SERVICE:CACHE,mode=max \
+           --cache-from type-registry,ref=$REGISTRY/$SERVICE:CACHE
+           --push \
            .
 
-          docker buildx rm frontend-builder
+          docker buildx rm "$BUILDER"
           
             '''
             }
@@ -98,12 +100,12 @@ pipeline {
            docker buildx build \
            --builder "$BUILDER" \
            --platform linux/amd64 \
-           --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \
-           --cache to=registry
-           --load \
+           --cache-to type=registry,ref=$REGISTRY/$SERVICE:CACHE,mode=max \
+           --cache-from type-registry,ref=$REGISTRY/$SERVICE:CACHE
+           --push \
            .
 
-          docker buildx rm frontend-builder
+          docker buildx rm "$BUILDER"
           
             '''
             }
