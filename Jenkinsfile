@@ -54,7 +54,8 @@ pipeline {
         steps {
           dir('frontend') {
             sh '''
-            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-frontend-${env.BUILD_NUMBER} .
+            docker build \
+             -t ${REGISTRY}/${GIT_COMMIT}-frontend-${BUILD_NUMBER} .
             '''
           }
         }
@@ -63,7 +64,8 @@ pipeline {
         steps {
           dir('backend') {
             sh '''
-            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-backend-${env.BUILD_NUMBER} . 
+            docker build \
+              -t ${REGISTRY}/${GIT_COMMIT}-backend-${BUILD_NUMBER} .
             '''
           }
         }
