@@ -100,7 +100,7 @@ pipeline {
            docker buildx build \
            --builder "$BUILDER" \
            --platform linux/amd64 \
-           --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \ 
+           --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \
            --cache-to type=registry,ref=$REGISTRY/$SERVICE:buildcache,mode=max \
            --cache-from type=registry,ref=$REGISTRY/$SERVICE:buildcache \
            --push \
