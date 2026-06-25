@@ -184,6 +184,11 @@ pipeline {
               syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
               '''
             }
+             post {
+            always {
+              archiveArtifacts artifacts: 'frontend-cylondx-sbom.json' allowEmptyArchive: true
+            }
+          }
           }
         stage('backend-sbom') {
            steps {
@@ -192,6 +197,11 @@ pipeline {
               syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
               '''
             }
+          post {
+            always {
+              archiveArtifacts artifacts: 'backend-cylondx-sbom.json' allowEmptyArchive: true
+            }
+          }
         }
         }
       }
