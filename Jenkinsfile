@@ -172,6 +172,8 @@ pipeline {
           }
         }
       }
+    }
+  }
 
       stage('generate sbom') {
         parallel {
@@ -195,5 +197,3 @@ pipeline {
       }
     }
   }
-}
-}
