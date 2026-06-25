@@ -1,6 +1,8 @@
 pipeline {
   agent any 
-
+  environment {
+    REGISTRY = 'rajesh00007'
+  }
   stages {
     stage('checkout-scm') {
       steps {
@@ -25,7 +27,7 @@ pipeline {
   stage('trivy fs scan') {
     steps {
       sh """
-      trivy fs .
+      trivy fs --scanners vuln,secret,misconfig .
       """
     }
   }
@@ -43,6 +45,28 @@ pipeline {
         npm ci --no-audit 
       
         '''
+      }
+    }
+  }
+  stage('image building'){
+    parallel {
+      stage('frontend-building') {
+        steps {
+          dir(frontend) {
+            sh '''
+            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-${frontend}-${env.BUILD_NUMBER} .
+            '''
+          }
+        }
+      }
+      stage('backend-building') {
+        steps {
+          dir(backend) {
+            sh '''
+            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-${backend}-${env.BUILD_NUMBER} . 
+            '''
+          }
+        }
       }
     }
   }
