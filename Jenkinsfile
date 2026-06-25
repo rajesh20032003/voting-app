@@ -31,24 +31,32 @@ pipeline {
       """
     }
   }
-  // stage('npm ci') {
-  //   agent {
-  //     docker { 
-  //       image 'node:24.17.0-alpine3.24'
-  //       args '-v $HOME/.npm:/root/.npm'
-  //       }
+  stage('quality-check') {
+    agent {
+      docker { 
+        image 'node:24.17.0-alpine3.24'
+        args '-v $HOME/.npm:/root/.npm'
+        }
 
-  //   }
-  //   steps {
-  //     dir('backend') {
-  //       sh '''
-  //       // npm ci --no-audit 
-  //       echo "backend"
+    }
+    steps {
+      dir('backend') {
+        sh '''
+        npm ci --no-audit 
+        npm test 
+        
       
-  //       '''
-  //     }
-  //   }
-  // }
+        '''
+      }
+    }
+    post {
+      always {
+         junit 'backend/reports/junit.xml'
+
+        archiveArtifacts artifacts: 'backend/coverage/lcov.info'
+      }
+    }
+  }
   stage('image building'){
     parallel {
       stage('frontend-building') {

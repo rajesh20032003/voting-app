@@ -90,9 +90,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Voting API running on port ${PORT}`);
-  console.log(`Options: ${votes.option_a.label} vs ${votes.option_b.label}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Voting API running on port ${PORT}`);
+    console.log(`Options: ${votes.option_a.label} vs ${votes.option_b.label}`);
+  });
+}
 
 module.exports = app;
