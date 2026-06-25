@@ -176,13 +176,21 @@ pipeline {
       stage('generate sbom') {
         parallel {
           stage('frontend-sbom'){
-            stages {
+            steps {
               sh '''
               SERVICE=frontend
               syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
               '''
             }
           }
+        stage('backend-sbom') {
+           steps {
+              sh '''
+              SERVICE=backend              
+              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclondx-sbom.json
+              '''
+            }
+        }
         }
       }
     }
