@@ -52,18 +52,18 @@ pipeline {
     parallel {
       stage('frontend-building') {
         steps {
-          dir(frontend) {
+          dir('frontend') {
             sh '''
-            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-${frontend}-${env.BUILD_NUMBER} .
+            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-frontend-${env.BUILD_NUMBER} .
             '''
           }
         }
       }
       stage('backend-building') {
         steps {
-          dir(backend) {
+          dir('backend') {
             sh '''
-            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-${backend}-${env.BUILD_NUMBER} . 
+            docker build -t ${env.REGISTRY}/${env.GIT_COMMIT}-backend-${env.BUILD_NUMBER} . 
             '''
           }
         }
