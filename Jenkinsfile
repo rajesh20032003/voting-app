@@ -35,13 +35,14 @@ pipeline {
     agent {
       docker { 
         image 'node:24.17.0-alpine3.24'
-        args '-v $HOME/.npm:/root/.npm'
+        args '--network devops-network -v $HOME/.npm:/root/.npm'
         }
 
     }
     steps {
       dir('backend') {
         sh '''
+        export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
         npm ci --no-audit 
         npm run test:ci
         
