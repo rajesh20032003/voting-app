@@ -64,7 +64,7 @@ pipeline {
            SERVICE=frontend
 
            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-           docker buildx create --name frontend-builder --driver docker-container --use
+           docker buildx create --name "$BUILDER" --driver docker-container --use
 
            docker buildx build \
            --builder "$BUILDER" \
@@ -96,9 +96,10 @@ pipeline {
            docker buildx create --name "$BUILDER" --driver docker-container --use
 
            docker buildx build \
-           --builder frontend-builder \
+           --builder "$BUILDER" \
            --platform linux/amd64 \
            --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \
+           --cache to=registry
            --load \
            .
 
