@@ -61,14 +61,15 @@ pipeline {
             )]){
            sh '''
            BUILDER=frontend-${BUILD_NUMBER}
-           
+           SERVICE=frontend
+
            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
            docker buildx create --name frontend-builder --driver docker-container --use
 
            docker buildx build \
-           --builder frontend-builder \
+           --builder "$BUILDER" \
            --platform linux/amd64 \
-           --tag ${REGISTRY}/frontend:${BUILD_NUMBER} \
+           --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \
            --load \
            .
 
@@ -82,21 +83,29 @@ pipeline {
       stage('backend-building') {
         steps {
           dir('backend') {
-            sh '''
-            docker buildx create \
-            --name backend \
-            --driver docker-container \
-            --use
+            withCredentials([usernamePassword(
+             credentialsId: 'dockerhub-creds',
+             usernameVariable: 'DOCKER_USER',
+             passwordVariable: 'DOCKER_PASS'
+            )]){
+           sh '''
+           BUILDER=backend-${BUILD_NUMBER}
+           SERVICE=backend
+           
+           echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+           docker buildx create --name "$BUILDER" --driver docker-container --use
 
-            docker buildx build \
-             --builder backend \
-             --platform linux/amd64 \
-             --tag ${REGISTRY}/backend:${BUILD_NUMBER} \
-             --load \
-             .
-            
-            docker buildx rm backend 
+           docker buildx build \
+           --builder frontend-builder \
+           --platform linux/amd64 \
+           --tag ${REGISTRY}/$SERVICE:${BUILD_NUMBER} \
+           --load \
+           .
+
+          docker buildx rm frontend-builder
+          
             '''
+            }
           }
         }
       }
