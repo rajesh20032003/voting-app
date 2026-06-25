@@ -49,27 +49,13 @@ pipeline {
   //     }
   //   }
   // }
-  stage('Debug BuildKit') {
-    steps {
-        sh '''
-        whoami
-        pwd
-
-        docker version
-        docker buildx version
-        docker buildx ls
-
-        docker context ls
-        '''
-    }
-}
   stage('image building'){
     parallel {
       stage('frontend-building') {
         steps {
           dir('frontend') {
             sh '''
-           docker buildx create --name frontend-builder --use
+           docker buildx create --name frontend-builder --driver docker-container --use
 
            docker buildx build \
            --builder frontend-builder \
@@ -77,6 +63,8 @@ pipeline {
            --tag ${REGISTRY}/frontend:${BUILD_NUMBER} \
            --load \
            .
+
+          docker buildx rm frontend-builder
             '''
           }
         }
@@ -85,8 +73,19 @@ pipeline {
         steps {
           dir('backend') {
             sh '''
-            docker build \
-              -t ${REGISTRY}/${GIT_COMMIT}-backend-${BUILD_NUMBER} .
+            docker buildx create \
+            --name backend \
+            --driver docker-container \
+            --use
+
+            docker buildx build \
+             --builder backend \
+             --platform linux/amd64 \
+             --tag ${REGISTRY}/frontend:${BUILD_NUMBER} \
+             --load \
+             .
+            
+            docker buildx rm backend 
             '''
           }
         }
