@@ -127,14 +127,21 @@ pipeline {
               sh '''
               SERVICE=frontend
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-              trivy image --cache-dir /tmp/trivy-$SERVICE /
-               --format json --output $SERVICE-report.json / --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
+             
+
+             trivy image \
+              --cache-dir /tmp/trivy-$SERVICE \
+              --format json \
+              --output ${SERVICE}-report.json \
+              --severity CRITICAL \
+              --exit-code 1 \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
               '''
             }
         }
          post {
           always {
-            archiveArtifacts artifacts: 'backend-report.json', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'frontend-report.json', allowEmptyArchive: true
           }
         }
       }
@@ -148,9 +155,14 @@ pipeline {
               sh '''
               SERVICE=backend
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-              trivy image --cache-dir /tmp/trivy-$SERVICE /
-              --format json --output $SERVICE-report.json /
-              --severity CRITICAL $REGISTRY/$SERVICE:${BUILD_NUMBER} 
+
+              trivy image \
+              --cache-dir /tmp/trivy-$SERVICE \
+              --format json \
+              --output ${SERVICE}-report.json \
+              --severity CRITICAL \
+              --exit-code 1 \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
               '''
             }
         }
