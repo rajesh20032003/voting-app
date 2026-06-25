@@ -54,14 +54,13 @@ pipeline {
       stage('frontend-building') {
         steps {
           dir('frontend') {
-            sh '''
             withCredentials([usernamePassword(
              crendentialsId: 'dockerhub-creds',
              usernameVariable: 'DOCKER_USER',
              passwordVariable: 'DOCKER_PASS'
             )]){
-           
-           echo $/DOCKER_PASS | docker login -u $/DOCKER_USER --password-stdin
+           sh '''
+           echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
            docker buildx create --name frontend-builder --driver docker-container --use
 
            docker buildx build \
@@ -72,9 +71,9 @@ pipeline {
            .
 
           docker buildx rm frontend-builder
-          }
-            '''
           
+            '''
+            }
           }
         }
       }
