@@ -218,8 +218,8 @@ backend/reports/junit.xml
       stage('deploy to prod') {
         steps {
           input {
-            message 'deploy to prod'
-            ok 'deploying to prod..'
+             message "Deploy to production?"
+                ok "Yes, deploy!"
           }
           sh '''
           echo "deploying to prod...."
