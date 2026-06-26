@@ -229,27 +229,6 @@ backend/reports/junit.xml
       //   }
       // }
 
-    stage('matrix-handson') {
-        matrix {
-          axes {
-            axis {
-              name 'os'
-              values 'linux','windows'
-            }
-            axis {
-              name 'versions'
-              values '1.0','2.0'
-            }
-          }
-        }
-        stages {
-          stage ('test') {
-            steps {
-              sh "test on ${os} with versions ${Versions}"
-            }
-          }
-        }
-      
-    }
+  
     }
   }
