@@ -215,18 +215,41 @@ backend/reports/junit.xml
         }
         }
       }
-      stage('deploy to prod') {
-        steps {
-          input {
-             message "Deploy to production?"
-                ok "Yes, deploy!"
+      // stage('deploy to prod') {
+      //   steps {
+      //     input {
+      //        message "Deploy to production?"
+      //           ok "Yes, deploy!"
+      //     }
+      //     sh '''
+      //     echo "deploying to prod...."
+      //     sleep 5
+      //     echo "deployed to prod"
+      //     '''
+      //   }
+      // }
+
+    stage('matrix-handson') {
+        matrix {
+          axes {
+            axis {
+              name 'os'
+              values 'linux','windows'
+            }
+            axis {
+              name 'versions'
+              values '1.0','2.0'
+            }
           }
-          sh '''
-          echo "deploying to prod...."
-          sleep 5
-          echo "deployed to prod"
-          '''
         }
-      }
+        stages {
+          stage ('test') {
+            steps {
+              sh "test on ${os} with versions ${Versions}"
+            }
+          }
+        }
+      
+    }
     }
   }
