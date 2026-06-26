@@ -215,5 +215,18 @@ backend/reports/junit.xml
         }
         }
       }
+      stage('deploy to prod') {
+        steps {
+          input {
+            message 'deploy to prod'
+            ok 'deploying to prod..'
+          }
+          sh '''
+          echo "deploying to prod...."
+          sleep 5
+          echo "deployed to prod"
+          '''
+        }
+      }
     }
   }
