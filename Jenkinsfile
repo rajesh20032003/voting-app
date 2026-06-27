@@ -2,6 +2,7 @@ pipeline {
   agent any 
   environment {
     REGISTRY = 'rajesh00007'
+    SCANNER_HOME = tool 'sonarScanner'
   }
   stages {
     stage('checkout-scm') {
@@ -39,11 +40,11 @@ pipeline {
         }
 
     }
-    //s
+    //export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
     steps {
       dir('backend') {
         sh '''
-        export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
+        
         npm ci --no-audit 
         npm run test:ci
         
@@ -57,6 +58,34 @@ pipeline {
 backend/coverage/lcov.info,
 backend/reports/junit.xml
 ''', allowEmptyArchive: true
+      }
+    }
+  }
+  stage('sonarqube analysis') {
+  steps {
+    dir('backend') {
+      withSonarQubeEnv('sonarQube') {
+        sh """
+        ${SCANNER_HOME}/bin/sonar-scanner \
+        -Dsonar.projectKey=voting-app \
+        -Dsonar.projectName=voting-app \
+        -Dsonar.projectVersion=${BUILD_NUMBER} \
+        -Dsonar.sources=. \
+        -Dsonar.tests=. \
+        -Dsonar.test.inclusions=**/*.test.js \
+        -Dsonar.exclusions=node_modules/**,coverage/** \
+        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+        -Dsonar.junit.reportPaths=reports/junit.xml
+        """
+      }
+    }
+  }
+  }
+
+  stage('quality-gate-sonarqube') {
+    steps {
+      timeout( time: 5, unit: 'MINUTES') {
+        waitForQualityGate abortPipeline: true
       }
     }
   }
@@ -217,30 +246,30 @@ backend/reports/junit.xml
         }
       }
 
-      stage('sbom upload') {
-        parallel {
-          stage('frontend-sbom-upload') {
-          steps {
-           dependencyTrackPublisher(
-            artifact: 'frontend-cyclonedx-sbom.json',
-            projectName: 'frontend',
-            projectVersion: "${BUILD_NUMBER}",
-            synchronous: true
-        )
-          }
-          }
-          stage('backend-sbom-upload') {
-          steps {
-           dependencyTrackPublisher(
-            artifact: 'backend-cyclonedx-sbom.json',
-            projectName: 'backend',
-            projectVersion: "${BUILD_NUMBER}",
-            synchronous: true
-        )
-          }
-          }
-        }
-      }
+      // stage('sbom upload') {
+      //   parallel {
+      //     stage('frontend-sbom-upload') {
+      //     steps {
+      //      dependencyTrackPublisher(
+      //       artifact: 'frontend-cyclonedx-sbom.json',
+      //       projectName: 'frontend',
+      //       projectVersion: "${BUILD_NUMBER}",
+      //       synchronous: true
+      //   )
+      //     }
+      //     }
+      //     stage('backend-sbom-upload') {
+      //     steps {
+      //      dependencyTrackPublisher(
+      //       artifact: 'backend-cyclonedx-sbom.json',
+      //       projectName: 'backend',
+      //       projectVersion: "${BUILD_NUMBER}",
+      //       synchronous: true
+      //   )
+      //     }
+      //     }
+      //   }
+      // }
     
 
   

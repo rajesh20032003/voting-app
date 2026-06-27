@@ -14,3 +14,11 @@ practice istio + argo rollouts + canary deployment
 do python scripting 
    bash scripting 
  
+ ####dtrack########
+ docker stop 549d3fa06d15 7790a05a1c63  0494b1aea27e
+ docker start 549d3fa06d15 7790a05a1c63  0494b1aea27e
+
+ #######nexus############
+ docker start nexus 
+
+ 
