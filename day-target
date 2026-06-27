@@ -1,0 +1,33 @@
+1. read and finish the revision script 
+2. setup dtrack and finish that 
+3. setup sonarqube and finish that 
+4. setup cosign and finish that 
+5. do some owsap practice 
+6. do handson on jira and integrate jira with dtrack
+7. do some handson on slack .
+
+#helm + k8 + istio + argocd 
+1. download some working app
+2. k8 the app 
+3. helm the app 
+4. add istio 
+5. add argocd 
+6. add promo,graf,loki .
+
+#python and bash 
+1. do some script handson on python and bash 
+
+today 
+1,2,3,4,5
+
+tommorow 
+6,7
+
+monday 
+1,2,3
+tuesday
+4,6
+wednesday
+5
+thursday,friday,saturday,sunday
+python and bash 

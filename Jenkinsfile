@@ -39,11 +39,11 @@ pipeline {
         }
 
     }
-    //export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
+    //s
     steps {
       dir('backend') {
         sh '''
-        
+        export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-11/
         npm ci --no-audit 
         npm run test:ci
         
@@ -222,7 +222,7 @@ backend/reports/junit.xml
           stage('frontend-sbom-upload') {
           steps {
            dependencyTrackPublisher(
-            artifact: 'backend-cyclonedx-sbom.json',
+            artifact: 'frontend-cyclonedx-sbom.json',
             projectName: 'frontend',
             projectVersion: "${BUILD_NUMBER}",
             synchronous: true
