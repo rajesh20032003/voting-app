@@ -73,27 +73,24 @@ backend/reports/junit.xml
       }
     }
   }
-  stage('debug sonar') {
+  stage('debug') {
     steps {
         script {
-            try {
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                    echo Hello
-                    env | grep SONAR
-                    ${SCANNER_HOME}/bin/sonar-scanner --version
-                    """
-                }
-            } catch (Exception e) {
-                echo "ERROR:"
-                echo e.toString()
-                e.printStackTrace()
-                throw e
+            echo "before"
+
+            withSonarQubeEnv('SonarQube') {
+                echo "inside"
+
+                sh """
+                echo hello
+                env | sort
+                """
             }
+
+            echo "after"
         }
     }
-  }
-
+}
   stage('sonarqube analysis') {
   steps {
    
