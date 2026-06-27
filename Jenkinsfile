@@ -2,7 +2,8 @@ pipeline {
   agent any 
   environment {
     REGISTRY = 'rajesh00007'
-    SCANNER_HOME = tool 'sonarScanner'
+    SCANNER_HOME = tool 'SonarScanner'
+    
   }
   stages {
     stage('checkout-scm') {
