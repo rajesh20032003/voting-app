@@ -2,6 +2,7 @@ pipeline {
   agent any 
   environment {
     REGISTRY = 'rajesh00007'
+    SCANNER_HOME = tool 'SonarScanner'
     
   }
   stages {
@@ -63,9 +64,7 @@ backend/reports/junit.xml
   }
   stage('sonarqube analysis') {
   steps {
-      environment {
-        SCANNER_HOME = tool 'SonarScanner'
-    }
+   
 
     dir('backend') {
       withSonarQubeEnv('sonarQube') {
