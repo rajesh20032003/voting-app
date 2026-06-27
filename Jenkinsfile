@@ -73,16 +73,21 @@ backend/reports/junit.xml
       }
     }
   }
-  stage('debug scanner') {
+stage('debug sonar') {
     steps {
-        script {
-            echo "Scanner Home = ${SCANNER_HOME}"
-        }
+        dir('backend') {
+            withSonarQubeEnv('sonarQube') {
+                sh """
+                echo "SCANNER_HOME=$SCANNER_HOME"
 
-        sh '''
-        ls -lah ${SCANNER_HOME}
-        ls -lah ${SCANNER_HOME}/bin
-        '''
+                ${SCANNER_HOME}/bin/sonar-scanner --version
+
+                java -version
+
+                env | grep SONAR
+                """
+            }
+        }
     }
 }
   stage('sonarqube analysis') {
