@@ -69,7 +69,7 @@ backend/reports/junit.xml
     dir('backend') {
       withSonarQubeEnv('sonarQube') {
         sh """
-        ${SCANNER_HOME}/bin/sonar-scanner \
+        sonar-scanner \
         -Dsonar.projectKey=voting-app \
         -Dsonar.projectName=voting-app \
         -Dsonar.projectVersion=${BUILD_NUMBER} \
