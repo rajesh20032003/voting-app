@@ -55,6 +55,17 @@ pipeline {
     }
     post {
       always {
+        stash(
+          name: 'backend-test-results',
+          includes: '''
+          backend/coverage/**,
+          backend/reports/**,
+          backend/package.json,
+          backend/package-lock.json,
+          backend/index.js,
+          backend/index.test.js
+          '''
+        )
         archiveArtifacts artifacts: '''
 backend/coverage/lcov.info,
 backend/reports/junit.xml
@@ -65,6 +76,7 @@ backend/reports/junit.xml
   stage('sonarqube analysis') {
   steps {
    
+   unstash 'backend-test-results'
 
     dir('backend') {
        sh '''
