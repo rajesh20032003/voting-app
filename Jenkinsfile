@@ -88,7 +88,7 @@ backend/reports/junit.xml
             which sonar-scanner
             sonar-scanner --version
             '''
-      withSonarQubeEnv('sonarQube') {
+      withSonarQubeEnv('SonarQube') {
         sh """
         sonar-scanner \
         -Dsonar.projectKey=voting-app \
