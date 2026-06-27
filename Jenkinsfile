@@ -43,7 +43,7 @@ pipeline {
     steps {
       dir('backend') {
         sh '''
-        export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-11/
+        export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
         npm ci --no-audit 
         npm run test:ci
         
