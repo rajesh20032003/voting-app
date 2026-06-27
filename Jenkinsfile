@@ -39,10 +39,11 @@ pipeline {
         }
 
     }
+    //export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
     steps {
       dir('backend') {
         sh '''
-        export NPM_CONFIG_REGISTRY=http://nexus:8081/repository/npm-proxy-1/
+        
         npm ci --no-audit 
         npm run test:ci
         
@@ -213,6 +214,31 @@ backend/reports/junit.xml
             }
           }
         }
+        }
+      }
+
+      stage('sbom upload') {
+        parallel {
+          stage('frontend-sbom-upload') {
+          steps {
+           dependencyTrackPublisher(
+            artifact: 'backend-cyclonedx-sbom.json',
+            projectName: 'frontend',
+            projectVersion: "${BUILD_NUMBER}",
+            synchronous: true
+        )
+          }
+          }
+          stage('backend-sbom-upload') {
+          steps {
+           dependencyTrackPublisher(
+            artifact: 'backend-cyclonedx-sbom.json',
+            projectName: 'backend',
+            projectVersion: "${BUILD_NUMBER}",
+            synchronous: true
+        )
+          }
+          }
         }
       }
     
