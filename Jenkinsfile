@@ -73,6 +73,18 @@ backend/reports/junit.xml
       }
     }
   }
+  stage('debug scanner') {
+    steps {
+        script {
+            echo "Scanner Home = ${SCANNER_HOME}"
+        }
+
+        sh '''
+        ls -lah ${SCANNER_HOME}
+        ls -lah ${SCANNER_HOME}/bin
+        '''
+    }
+}
   stage('sonarqube analysis') {
   steps {
    
