@@ -92,6 +92,7 @@ backend/reports/junit.xml
             }
         }
     }
+  }
 
   stage('sonarqube analysis') {
   steps {
