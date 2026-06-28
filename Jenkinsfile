@@ -98,12 +98,13 @@ backend/reports/junit.xml
 
     dir('backend') {
        sh '''
-            pwd
-            ls -lah
-            ls -lah coverage
-            ls -lah reports
-            which sonar-scanner
-            sonar-scanner --version
+           pwd
+        ls -lah
+        ls -lah coverage
+        ls -lah reports
+        echo "SCANNER_HOME is: $SCANNER_HOME"      
+        ls -lah $SCANNER_HOME/bin/sonar-scanner || echo "sonar-scanner binary NOT found"  
+
             '''
       withSonarQubeEnv('SonarQube') {
         sh """
