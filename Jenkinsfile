@@ -180,121 +180,121 @@ backend/reports/junit.xml
       }
     }
   }
-  // stage('trivy scan'){
-  //   parallel {
-  //     stage('frontend-img-scan') {
-  //       steps{
-  //       withCredentials([usernamePassword(
-  //            credentialsId: 'dockerhub-creds',
-  //            usernameVariable: 'DOCKER_USER',
-  //            passwordVariable: 'DOCKER_PASS'
-  //           )]){
-  //             sh '''
-  //             SERVICE=frontend
-  //             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+  stage('trivy scan'){
+    parallel {
+      stage('frontend-img-scan') {
+        steps{
+        withCredentials([usernamePassword(
+             credentialsId: 'dockerhub-creds',
+             usernameVariable: 'DOCKER_USER',
+             passwordVariable: 'DOCKER_PASS'
+            )]){
+              sh '''
+              SERVICE=frontend
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
              
 
-  //            trivy image \
-  //             --cache-dir /tmp/trivy-$SERVICE \
-  //             --format json \
-  //             --output ${SERVICE}-report.json \
-  //             --severity CRITICAL \
-  //             --exit-code 1 \
-  //             ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
-  //             '''
-  //           }
-  //       }
-  //        post {
-  //         always {
-  //           archiveArtifacts artifacts: 'frontend-report.json', allowEmptyArchive: true
-  //         }
-  //       }
-  //     }
-  //     stage('backend-img-scan') {
-  //       steps{
-  //       withCredentials([usernamePassword(
-  //            credentialsId: 'dockerhub-creds',
-  //            usernameVariable: 'DOCKER_USER',
-  //            passwordVariable: 'DOCKER_PASS'
-  //           )]){
-  //             sh '''
-  //             SERVICE=backend
-  //             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+             trivy image \
+              --cache-dir /tmp/trivy-$SERVICE \
+              --format json \
+              --output ${SERVICE}-report.json \
+              --severity CRITICAL \
+              --exit-code 1 \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
+              '''
+            }
+        }
+         post {
+          always {
+            archiveArtifacts artifacts: 'frontend-report.json', allowEmptyArchive: true
+          }
+        }
+      }
+      stage('backend-img-scan') {
+        steps{
+        withCredentials([usernamePassword(
+             credentialsId: 'dockerhub-creds',
+             usernameVariable: 'DOCKER_USER',
+             passwordVariable: 'DOCKER_PASS'
+            )]){
+              sh '''
+              SERVICE=backend
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-  //             trivy image \
-  //             --cache-dir /tmp/trivy-$SERVICE \
-  //             --format json \
-  //             --output ${SERVICE}-report.json \
-  //             --severity CRITICAL \
-  //             --exit-code 1 \
-  //             ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
-  //             '''
-  //           }
-  //       }
-  //       post {
-  //         always {
-  //           archiveArtifacts artifacts: 'backend-report.json', allowEmptyArchive: true
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+              trivy image \
+              --cache-dir /tmp/trivy-$SERVICE \
+              --format json \
+              --output ${SERVICE}-report.json \
+              --severity CRITICAL \
+              --exit-code 1 \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
+              '''
+            }
+        }
+        post {
+          always {
+            archiveArtifacts artifacts: 'backend-report.json', allowEmptyArchive: true
+          }
+        }
+      }
+    }
+  }
 
-  //     stage('generate sbom') {
-  //       parallel {
-  //         stage('frontend-sbom'){
-  //           steps {
-  //             sh '''
-  //             SERVICE=frontend
-  //             syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclonedx-sbom.json
-  //             '''
-  //           }
-  //            post {
-  //           always {
-  //             archiveArtifacts artifacts: 'frontend-cyclonedx-sbom.json', allowEmptyArchive: true
-  //           }
-  //         }
-  //         }
-  //       stage('backend-sbom') {
-  //          steps {
-  //             sh '''
-  //             SERVICE=backend              
-  //             syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclonedx-sbom.json
-  //             '''
-  //           }
-  //         post {
-  //           always {
-  //             archiveArtifacts artifacts: 'backend-cyclonedx-sbom.json' ,allowEmptyArchive: true
-  //           }
-  //         }
-  //       }
-  //       }
-  //     }
+      stage('generate sbom') {
+        parallel {
+          stage('frontend-sbom'){
+            steps {
+              sh '''
+              SERVICE=frontend
+              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclonedx-sbom.json
+              '''
+            }
+             post {
+            always {
+              archiveArtifacts artifacts: 'frontend-cyclonedx-sbom.json', allowEmptyArchive: true
+            }
+          }
+          }
+        stage('backend-sbom') {
+           steps {
+              sh '''
+              SERVICE=backend              
+              syft ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} -o cyclonedx-json > $SERVICE-cyclonedx-sbom.json
+              '''
+            }
+          post {
+            always {
+              archiveArtifacts artifacts: 'backend-cyclonedx-sbom.json' ,allowEmptyArchive: true
+            }
+          }
+        }
+        }
+      }
 
-  //     stage('dtrack-sbom-upload') {
-  //       parallel {
-  //         stage('frontend-sbom-upload') {
-  //         steps {
-  //          dependencyTrackPublisher(
-  //           artifact: 'frontend-cyclonedx-sbom.json',
-  //           projectName: 'frontend',
-  //           projectVersion: "${BUILD_NUMBER}",
-  //           synchronous: true
-  //       )
-  //         }
-  //         }
-  //         stage('backend-sbom-upload') {
-  //         steps {
-  //          dependencyTrackPublisher(
-  //           artifact: 'backend-cyclonedx-sbom.json',
-  //           projectName: 'backend',
-  //           projectVersion: "${BUILD_NUMBER}",
-  //           synchronous: true
-  //       )
-  //         }
-  //         }
-  //       }
-  //     }
+      stage('dtrack-sbom-upload') {
+        parallel {
+          stage('frontend-sbom-upload') {
+          steps {
+           dependencyTrackPublisher(
+            artifact: 'frontend-cyclonedx-sbom.json',
+            projectName: 'frontend',
+            projectVersion: "${BUILD_NUMBER}",
+            synchronous: true
+        )
+          }
+          }
+          stage('backend-sbom-upload') {
+          steps {
+           dependencyTrackPublisher(
+            artifact: 'backend-cyclonedx-sbom.json',
+            projectName: 'backend',
+            projectVersion: "${BUILD_NUMBER}",
+            synchronous: true
+        )
+          }
+          }
+        }
+      }
 
       stage('cosign-image-signing') {
         parallel {
