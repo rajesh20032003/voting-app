@@ -73,24 +73,7 @@ backend/reports/junit.xml
       }
     }
   }
-  stage('debug') {
-    steps {
-        script {
-            echo "before"
 
-            withSonarQubeEnv('SonarQube') {
-                echo "inside"
-
-                sh """
-                echo hello
-                env | sort
-                """
-            }
-
-            echo "after"
-        }
-    }
-}
   stage('sonarqube analysis') {
   steps {
    
@@ -288,30 +271,30 @@ backend/reports/junit.xml
         }
       }
 
-      // stage('sbom upload') {
-      //   parallel {
-      //     stage('frontend-sbom-upload') {
-      //     steps {
-      //      dependencyTrackPublisher(
-      //       artifact: 'frontend-cyclonedx-sbom.json',
-      //       projectName: 'frontend',
-      //       projectVersion: "${BUILD_NUMBER}",
-      //       synchronous: true
-      //   )
-      //     }
-      //     }
-      //     stage('backend-sbom-upload') {
-      //     steps {
-      //      dependencyTrackPublisher(
-      //       artifact: 'backend-cyclonedx-sbom.json',
-      //       projectName: 'backend',
-      //       projectVersion: "${BUILD_NUMBER}",
-      //       synchronous: true
-      //   )
-      //     }
-      //     }
-      //   }
-      // }
+      stage('sbom upload') {
+        parallel {
+          stage('frontend-sbom-upload') {
+          steps {
+           dependencyTrackPublisher(
+            artifact: 'frontend-cyclonedx-sbom.json',
+            projectName: 'frontend',
+            projectVersion: "${BUILD_NUMBER}",
+            synchronous: true
+        )
+          }
+          }
+          stage('backend-sbom-upload') {
+          steps {
+           dependencyTrackPublisher(
+            artifact: 'backend-cyclonedx-sbom.json',
+            projectName: 'backend',
+            projectVersion: "${BUILD_NUMBER}",
+            synchronous: true
+        )
+          }
+          }
+        }
+      }
     
 
   
