@@ -271,7 +271,7 @@ backend/reports/junit.xml
         }
       }
 
-      stage('sbom upload') {
+      stage('dtrack-sbom-upload') {
         parallel {
           stage('frontend-sbom-upload') {
           steps {
@@ -295,6 +295,88 @@ backend/reports/junit.xml
           }
         }
       }
+
+      stage('cosign-image-signing') {
+        parallel {
+          stage('sign-frontend') {
+            steps {
+              withCredentials([
+                string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                string(credentialsId: 'AWS_SECRET_ACCESS_KEY', varialbe: 'AWS_SECRET_ACCESS_KEY'),
+                string(credentialsId: 'AWS_REGION', variable: 'AWS_DEFAULT_REGION'),
+                string(credentialsId: 'COSIGN_KMS_KEY',variable: 'KMS_KEY') 
+              ]) {
+                sh '''
+                  SERVICE=frontend
+                  cosign sign \
+                  --key ${KMS_KEY} \
+                  --yes \
+                  ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
+                '''
+              }
+            }
+          }
+     stage('sign-backend') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION'),
+          string(credentialsId: 'COSIGN_KMS_KEY',        variable: 'KMS_KEY')
+        ]) {
+          sh '''
+            SERVICE=backend
+            cosign sign \
+              --key ${KMS_KEY} \
+              --yes \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER}
+          '''
+        }
+      }
+    }
+        }
+      }
+
+    stage('verify-signatures') {
+      parallel {
+        stage('verify-frontend') {
+          steps {
+          withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION'),
+          string(credentialsId: 'COSIGN_KMS_KEY',        variable: 'KMS_KEY')
+        ]) {
+          sh '''
+            SERVICE=frontend
+            cosign verify \
+              --key ${KMS_KEY} \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} \
+              | jq .
+          '''
+        }
+          }
+        }
+         stage('verify-backend') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION'),
+          string(credentialsId: 'COSIGN_KMS_KEY',        variable: 'KMS_KEY')
+        ]) {
+          sh '''
+            SERVICE=backend
+            cosign verify \
+              --key ${KMS_KEY} \
+              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} \
+              | jq .
+          '''
+        }
+      }
+    }
+      }
+    }
     
 
   
