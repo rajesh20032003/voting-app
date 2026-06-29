@@ -281,8 +281,7 @@ backend/reports/junit.xml
             projectVersion: "${BUILD_NUMBER}",
             synchronous: true,
             projectProperties: [
-              parentName: 'frontend-parent',
-              ParentVersion: '1.0'
+              parentId: 'e1a02cde-4b6d-4442-a402-e4323c20a631'
             ]
         )
           }
