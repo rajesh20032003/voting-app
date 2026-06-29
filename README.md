@@ -6,8 +6,8 @@
 6. nexus done
 7. sonarqube
     test reports done
-8. cosign
-9. dependency track
+8. cosign done 
+9. dependency track done 
 
 practice istio + argo rollouts + canary deployment 
 

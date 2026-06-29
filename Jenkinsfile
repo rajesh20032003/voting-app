@@ -279,7 +279,11 @@ backend/reports/junit.xml
             artifact: 'frontend-cyclonedx-sbom.json',
             projectName: 'frontend',
             projectVersion: "${BUILD_NUMBER}",
-            synchronous: true
+            synchronous: true,
+            projectProperties: [
+              parentName: 'frontend-parent',
+              ParentVersion: '1.0'
+            ]
         )
           }
           }
