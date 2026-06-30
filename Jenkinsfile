@@ -27,6 +27,7 @@ pipeline {
     }
   }
   stage('trivy fs scan') {
+
     steps {
       sh """
       trivy fs --scanners vuln,secret,misconfig .
@@ -34,7 +35,7 @@ pipeline {
     }
     post {
       success {
-          slackSend(channel: '#new-channel', color: 'good', message: "trivy fs successful for {env.JOB_NAME} and ${BUILD_NUMBER}")
+          slackSend(channel: '#new-channel', color: 'good', message: "trivy fs successful for ${JOB_NAME} and ${BUILD_NUMBER}")
       }
       failure {
         slackSend(channel: '#new-channel', color: 'danger', message: 'trivy fs is failed for {env.JOB_NAME} and ${env.BUILD_NUMBER}')
