@@ -3,14 +3,45 @@ pipeline {
   environment {
     REGISTRY = 'rajesh00007'
     SCANNER_HOME = tool 'SonarScanner'
-    
-  }
+    SLACK_TS = ''
+
   stages {
+    stage('notify-start') {
+      steps {
+        script {
+          def response = slacksend(
+            channel: '#new-channel',
+            color: '#439FE0',
+            message: "Build started: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+          )
+          env.SLACK_TS = response.ts 
+        }
+      }
+    }   
+  
     stage('checkout-scm') {
       steps {
          cleanWs()
          checkout scm  
          echo "checking out rthe code from last commit : ${env.GIT_COMMIT}"
+      }
+      post {
+        success {
+            slacksend(
+              channel: '#new-channel',
+              color: 'good',
+              message: "checkout scm is completed",
+              timestamp: env.SLACK_TS
+            )
+        }
+        failure {
+           slacksend(
+              channel: '#new-channel',
+              color: 'danger',
+              message: "checkout scm is failed",
+              timestamp: env.SLACK_TS
+            )
+        }
       }
     }
   
@@ -32,14 +63,6 @@ pipeline {
       sh """
       trivy fs --scanners vuln,secret,misconfig .
       """
-    }
-    post {
-      success {
-          slackSend(channel: '#new-channel', color: 'good', message: "trivy fs successful for ${JOB_NAME} and ${BUILD_NUMBER}")
-      }
-      failure {
-        slackSend(channel: '#new-channel', color: 'danger', message: 'trivy fs is failed for {env.JOB_NAME} and ${env.BUILD_NUMBER}')
-      }
     }
   }
   stage('quality-check') {
@@ -83,21 +106,6 @@ backend/reports/junit.xml
     }
   }
 
-  stage('i will fail') {
-    steps {
-      sh """
-      exit 1 
-      """
-    }
-    post {
-      success {
-          slacksend(channel: '#all-slack-practice', color: 'good', message: 'i will fail is passed')
-      }
-      failure {
-        slacksend(channel: '#all-slack-practice', color: 'danger', message: 'i will fail is failed')
-      }
-    }
-  }
 
 // stage('sonarqube analysis') {
 //   steps {
@@ -405,11 +413,27 @@ backend/reports/junit.xml
           '''
         }
       }
+      post {
+        success {
+          slackSend(
+            channel: '#new-channel',
+            color: 'good',
+            message: 'pipeline was successfull!'
+          )
+        }
+        failure {
+          slackSend(
+            channel: '#new-channel',
+            color: 'danger',
+            message: 'pipeline was unsuccessfull!'
+          )
+        }
+      }
     }
       }
     }
     
-
+  }
   
     }
   }
