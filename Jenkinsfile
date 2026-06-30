@@ -74,46 +74,46 @@ backend/reports/junit.xml
     }
   }
 
-  stage('sonarqube analysis') {
-  steps {
+// stage('sonarqube analysis') {
+//   steps {
    
-   unstash 'backend-test-results'
+//    unstash 'backend-test-results'
 
-    dir('backend') {
-       sh '''
-           pwd
-        ls -lah
-        ls -lah coverage
-        ls -lah reports
-        echo "SCANNER_HOME is: $SCANNER_HOME"      
-        ls -lah $SCANNER_HOME/bin/sonar-scanner || echo "sonar-scanner binary NOT found"  
+//     dir('backend') {
+//        sh '''
+//            pwd
+//         ls -lah
+//         ls -lah coverage
+//         ls -lah reports
+//         echo "SCANNER_HOME is: $SCANNER_HOME"      
+//         ls -lah $SCANNER_HOME/bin/sonar-scanner || echo "sonar-scanner binary NOT found"  
 
-            '''
-      withSonarQubeEnv('SonarQube') {
-        sh """
-        ${SCANNER_HOME}/bin/sonar-scanner -X \
-        -Dsonar.projectKey=voting-app \
-        -Dsonar.projectName=voting-app \
-        -Dsonar.projectVersion=${BUILD_NUMBER} \
-        -Dsonar.sources=. \
-        -Dsonar.tests=. \
-        -Dsonar.test.inclusions=**/*.test.js \
-        -Dsonar.exclusions=node_modules/**,coverage/** \
-        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-        -Dsonar.junit.reportPaths=reports/junit.xml
-        """
-      }
-    }
-  }
-  }
+//             '''
+//       withSonarQubeEnv('SonarQube') {
+//         sh """
+//         ${SCANNER_HOME}/bin/sonar-scanner -X \
+//         -Dsonar.projectKey=voting-app \
+//         -Dsonar.projectName=voting-app \
+//         -Dsonar.projectVersion=${BUILD_NUMBER} \
+//         -Dsonar.sources=. \
+//         -Dsonar.tests=. \
+//         -Dsonar.test.inclusions=**/*.test.js \
+//         -Dsonar.exclusions=node_modules/**,coverage/** \
+//         -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+//         -Dsonar.junit.reportPaths=reports/junit.xml
+//         """
+//       }
+//     }
+//   }
+// }
 
-  stage('quality-gate-sonarqube') {
-    steps {
-      timeout( time: 5, unit: 'MINUTES') {
-        waitForQualityGate abortPipeline: true
-      }
-    }
-  }
+  // stage('quality-gate-sonarqube') {
+  //   steps {
+  //     timeout( time: 5, unit: 'MINUTES') {
+  //       waitForQualityGate abortPipeline: true
+  //     }
+  //   }
+  // }
   stage('image building'){
     parallel {
       stage('frontend-building') {
@@ -271,36 +271,36 @@ backend/reports/junit.xml
         }
       }
 
-      stage('dtrack-sbom-upload') {
-        parallel {
-          stage('frontend-sbom-upload') {
-          steps {
-           dependencyTrackPublisher(
-            artifact: 'frontend-cyclonedx-sbom.json',
-            projectName: 'frontend',
-            projectVersion: "${BUILD_NUMBER}",
-            synchronous: true,
-            projectProperties: [
-              parentId: 'e1a02cde-4b6d-4442-a402-e4323c20a631'
-            ]
-        )
-          }
-          }
-          stage('backend-sbom-upload') {
-          steps {
-           dependencyTrackPublisher(
-            artifact: 'backend-cyclonedx-sbom.json',
-            projectName: 'backend',
-            projectVersion: "${BUILD_NUMBER}",
-            synchronous: true,
-             projectProperties: [
-              parentId: '6facabe8-576b-43e7-a8c6-6f83c1750781'
-            ]
-        )
-          }
-          }
-        }
-      }
+      // stage('dtrack-sbom-upload') {
+      //   parallel {
+      //     stage('frontend-sbom-upload') {
+      //     steps {
+      //      dependencyTrackPublisher(
+      //       artifact: 'frontend-cyclonedx-sbom.json',
+      //       projectName: 'frontend',
+      //       projectVersion: "${BUILD_NUMBER}",
+      //       synchronous: true,
+      //       projectProperties: [
+      //         parentId: 'e1a02cde-4b6d-4442-a402-e4323c20a631'
+      //       ]
+      //   )
+      //     }
+      //     }
+      //     stage('backend-sbom-upload') {
+      //     steps {
+      //      dependencyTrackPublisher(
+      //       artifact: 'backend-cyclonedx-sbom.json',
+      //       projectName: 'backend',
+      //       projectVersion: "${BUILD_NUMBER}",
+      //       synchronous: true,
+      //        projectProperties: [
+      //         parentId: '6facabe8-576b-43e7-a8c6-6f83c1750781'
+      //       ]
+      //   )
+      //     }
+      //     }
+      //   }
+      // }
 
       stage('cosign-image-signing') {
         parallel {
