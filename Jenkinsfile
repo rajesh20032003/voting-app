@@ -13,9 +13,14 @@ pipeline {
           def response = slackSend(
             channel: '#new-channel',
             color: '#439FE0',
-            message: "Build started: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            message: """
+            *job:* ${env.JOB_NAME}
+            *Build:* #${env.BUILD_NUMBER}
+            *Branch:* ${env.BRANCH_NAME}
+            *Triggered By:* ${currentBuild.getBuildCauses()[0].shortDescription}
+            """
           )
-          env.SLACK_TS = response.ts 
+          env.SLACK_TS = response.threadId
         }
       }
     }   
@@ -29,7 +34,7 @@ pipeline {
       post {
         success {
             slackSend(
-              channel: '#new-channel',
+              channel: env.SLACK_TS,
               color: 'good',
               message: "checkout scm is completed",
               timestamp: env.SLACK_TS
@@ -37,7 +42,7 @@ pipeline {
         }
         failure {
            slacksend(
-              channel: '#new-channel',
+              channel: env.SLACK_TS,
               color: 'danger',
               message: "checkout scm is failed",
               timestamp: env.SLACK_TS
@@ -422,14 +427,14 @@ backend/reports/junit.xml
     post {
         success {
           slackSend(
-            channel: '#new-channel',
+            channel: env.SLACK_TS,
             color: 'good',
             message: 'pipeline was successfull!'
           )
         }
         failure {
           slackSend(
-            channel: '#new-channel',
+            channel: env.SLACK_TS,
             color: 'danger',
             message: 'pipeline was unsuccessfull!'
           )
