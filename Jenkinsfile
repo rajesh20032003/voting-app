@@ -416,9 +416,9 @@ backend/reports/junit.xml
                }
              }
            }
-        }
+      }
       
-      post {
+    post {
         success {
           slackSend(
             channel: '#new-channel',
@@ -434,7 +434,7 @@ backend/reports/junit.xml
           )
         }
       }
-    }
+  }
 }
   
     
