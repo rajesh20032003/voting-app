@@ -32,7 +32,7 @@ pipeline {
               channel: '#new-channel',
               color: 'good',
               message: "checkout scm is completed",
-              timestamp: env.SLACK_TS
+              timestamp: response.ts
             )
         }
         failure {
@@ -40,7 +40,7 @@ pipeline {
               channel: '#new-channel',
               color: 'danger',
               message: "checkout scm is failed",
-              timestamp: env.SLACK_TS
+              timestamp: response.ts
             )
         }
       }
@@ -398,22 +398,26 @@ backend/reports/junit.xml
           }
         }
          stage('verify-backend') {
-      steps {
-        withCredentials([
-          string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION'),
-          string(credentialsId: 'COSIGN_KMS_KEY',        variable: 'KMS_KEY')
-        ]) {
-          sh '''
-            SERVICE=backend
-            cosign verify \
-              --key ${KMS_KEY} \
-              ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} \
-              | jq .
-          '''
+            steps {
+              withCredentials([
+                string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+                string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+                string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION'),
+                string(credentialsId: 'COSIGN_KMS_KEY',        variable: 'KMS_KEY')
+              ]) {
+                sh '''
+                  SERVICE=backend
+                  cosign verify \
+                    --key ${KMS_KEY} \
+                    ${REGISTRY}/${SERVICE}:${BUILD_NUMBER} \
+                    | jq .
+                '''
+                 }
+               }
+             }
+           }
         }
-      }
+      
       post {
         success {
           slackSend(
@@ -431,10 +435,8 @@ backend/reports/junit.xml
         }
       }
     }
-      }
-    }
-    
-  }
+}
   
-    }
+    
+  
   
