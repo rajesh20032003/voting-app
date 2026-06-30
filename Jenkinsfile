@@ -10,7 +10,7 @@ pipeline {
     stage('notify-start') {
       steps {
         script {
-          def response = slacksend(
+          def response = slackSend(
             channel: '#new-channel',
             color: '#439FE0',
             message: "Build started: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
@@ -28,11 +28,11 @@ pipeline {
       }
       post {
         success {
-            slacksend(
+            slackSend(
               channel: '#new-channel',
               color: 'good',
               message: "checkout scm is completed",
-              timestamp: response.ts
+              timestamp: env.SLACK_TS
             )
         }
         failure {
@@ -40,7 +40,7 @@ pipeline {
               channel: '#new-channel',
               color: 'danger',
               message: "checkout scm is failed",
-              timestamp: response.ts
+              timestamp: env.SLACK_TS
             )
         }
       }
