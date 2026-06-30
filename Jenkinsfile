@@ -32,6 +32,14 @@ pipeline {
       trivy fs --scanners vuln,secret,misconfig .
       """
     }
+    post {
+      success {
+          slackSend(channel: '#new-channel', color: 'good', message: 'trivy fs successful for {env.JOB_NAME} and ${env.BUILD_NUMBER}')
+      }
+      failure {
+        slackSend(channel: '#new-channel', color: 'danger', message: 'trivy fs is failed for {env.JOB_NAME} and ${env.BUILD_NUMBER}')
+      }
+    }
   }
   stage('quality-check') {
     agent {
@@ -70,6 +78,22 @@ pipeline {
 backend/coverage/lcov.info,
 backend/reports/junit.xml
 ''', allowEmptyArchive: true
+      }
+    }
+  }
+
+  stage('i will fail') {
+    steps {
+      sh """
+      exit 1 
+      """
+    }
+    post {
+      success {
+          slacksend(channel: '#new-channel', color: 'good', message: 'i will fail is passed')
+      }
+      failure {
+        slacksend(channel: '#new-channel', color: 'danger', message: 'i will fail is failed')
       }
     }
   }
