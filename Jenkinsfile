@@ -30,6 +30,9 @@ pipeline {
          cleanWs()
          checkout scm  
          echo "checking out rthe code from last commit : ${env.GIT_COMMIT}"
+         sh '''
+         echo "THREAD=${env.SLACK_TS}"
+         '''
       }
       post {
         success {
