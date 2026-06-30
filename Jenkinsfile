@@ -37,7 +37,6 @@ pipeline {
               channel: env.SLACK_TS,
               color: 'good',
               message: "checkout scm is completed",
-              timestamp: env.SLACK_TS
             )
         }
         failure {
@@ -45,7 +44,6 @@ pipeline {
               channel: env.SLACK_TS,
               color: 'danger',
               message: "checkout scm is failed",
-              timestamp: env.SLACK_TS
             )
         }
       }
