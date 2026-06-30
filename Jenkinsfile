@@ -417,6 +417,7 @@ backend/reports/junit.xml
              }
            }
       }
+  } 
       
     post {
         success {
@@ -435,7 +436,7 @@ backend/reports/junit.xml
         }
       }
   }
-}
+
   
     
   
