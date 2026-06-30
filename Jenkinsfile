@@ -4,6 +4,7 @@ pipeline {
     REGISTRY = 'rajesh00007'
     SCANNER_HOME = tool 'SonarScanner'
     SLACK_TS = ''
+  }
 
   stages {
     stage('notify-start') {
